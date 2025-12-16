@@ -14,3 +14,5 @@
  -room.ejs is a html file where the our code will live. It will help to pass the variable to the html.
 
  -ejs embedded javascript, it will help variable from backend to the frontend.
+
+ -socket.io is used for the asynchronous realtime responses.
