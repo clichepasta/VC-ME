@@ -1,0 +1,51 @@
+/* App styles: layout, video grid, controls, panels (Zoom-like UI) */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Segoe UI, Roboto, Arial, sans-serif;background:#0f1724;color:#e6eef8}
+
+/* Topbar (if present) */
+.topbar{height:56px;background:#0b1220; margin-top: 10px; border-bottom:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.topbar .left{display:flex;align-items:center}
+.topbar .right{display:flex;align-items:center}
+.brand{font-weight:700;margin-right:12px}
+.room-label{font-size:13px;color:#a9b7c7}
+.control{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#dbeafe;padding:6px 10px;border-radius:6px;margin-left:8px;cursor:pointer}
+.leave{background:#ef4444;color:#fff;border-color:transparent}
+
+/* Main layout */
+.main{display:flex;flex:1;height:calc(100vh);}
+.mainLeft{flex:1;display:flex;flex-direction:column}
+.mainRight{width:320px;background:#08101a;border-left:1px solid rgba(255,255,255,0.02);display:flex;flex-direction:column}
+
+.mainvideos{flex:1;padding:16px;display:flex;align-items:center;justify-content:center}
+
+/* Video grid */
+#video-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));width: 100%;
+    height: 100%;align-content:start}
+#video-grid video{    width: 100%;
+    height: 100%;object-fit:cover;border-radius:8px;background:#000}
+.video-tile{width:100%;height:240px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:linear-gradient(180deg,#08121a,#000);color:#fff;font-weight:600}
+
+/* Controls bar */
+.mainControls{height:72px;display:flex;align-items:center;padding:8px 16px;border-top:1px solid rgba(255,255,255,0.02);gap:8px}
+.controlButton{margin-right:8px;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8;cursor:pointer}
+.controlButton.active{background:#2563eb;color:#fff}
+
+/* Right side panels */
+.panel{padding:12px;border-bottom:1px solid rgba(255,255,255,0.02);overflow:auto}
+.mainHeader{padding:12px;border-bottom:1px solid rgba(255,255,255,0.02)}
+.participants-list{list-style:none;padding:0;margin:0}
+.participants-list li{padding:6px 4px;border-radius:4px}
+.messages{height:calc(100vh - 240px);overflow:auto;padding:8px;background:rgba(255,255,255,0.02);border-radius:6px}
+.chat-input{display:flex;margin-top:8px}
+.chat-input input{flex:1;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+.chat-input button{margin-left:8px;padding:8px 12px;border-radius:6px;border:none;background:#2563eb;color:white}
+
+/* Responsive */
+@media (max-width:900px){
+    .mainRight{display:none}
+    #video-grid video, .video-tile{height:160px}
+}
+
+/* Utility classes */
+.hidden{display:none !important}
+.center{display:flex;align-items:center;justify-content:center}
