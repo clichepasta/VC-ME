@@ -6,10 +6,95 @@
     <title>VC-ME</title>
     <link rel="stylesheet" href="/style.css">
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
 </head>
-<body>
-    <div id="video-grid">
-        
+<body data-room-id="<%= roomId %>">
+    <header class="topbar" role="banner">
+        <div class="left" aria-hidden="false">
+            <h1 class="brand">VC-ME</h1>
+            <div class="room-label">Room: <span class="room-id"><%= roomId %></span></div>
+        </div>
+        <nav class="right" role="navigation" aria-label="Session controls">
+            <button id="btn-participants" class="control" aria-pressed="false" aria-label="Toggle participants panel">
+                <!-- participants icon -->
+                <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M16 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM8 11c1.657 0 3-1.343 3-3S9.657 5 8 5 5 6.343 5 8s1.343 3 3 3zM8 13c-2.67 0-8 1.337-8 4v2h16v-2c0-2.663-5.33-4-8-4zM16 13c-.29 0-.558.02-.817.059C15.083 13.36 16 14.545 16 16v2h6v-2c0-2.663-5.33-4-8-4z" fill="currentColor"/></svg>
+                <span class="label">Participants</span>
+            </button>
+            <button id="btn-chat" class="control" aria-pressed="false" aria-label="Toggle chat panel">
+                <!-- chat icon -->
+                <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 2H4a2 2 0 00-2 2v14l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2z" fill="currentColor"/></svg>
+                <span class="label">Chat</span>
+            </button>
+            <button id="leave" class="control leave" aria-label="Leave meeting">
+                <!-- leave icon -->
+                <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3h-8v2h8v14h-8v2h8a2 2 0 002-2V5a2 2 0 00-2-2z" fill="currentColor"/></svg>
+                <span class="label">Leave</span>
+            </button>
+        </nav>
+    </header>
+
+    <main class="main" role="main">
+        <section class="mainLeft" aria-live="polite">
+            <div class="mainvideos">
+                <div id="video-grid" aria-label="Video grid" role="list">
+                    <!-- template-based video tiles will be inserted here -->
+                </div>
+            </div>
+
+            <div class="mainControls" role="toolbar" aria-label="Meeting controls">
+                <button id="btn-mute" onClick="muteUnmute()" class="controlButton" aria-pressed="false" aria-label="Mute or unmute"> 
+                    <!-- mic icon -->
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zM19 11v-1h-1V11c0 3.309-2.691 6-6 6s-6-2.691-6-6v-1H5v1c0 3.866 3.134 7 7 7s7-3.134 7-7z" fill="currentColor"/></svg>
+                    <span>Mute</span>
+                </button>
+
+                <button id="btn-video" onclick="startStopVideo()" class="controlButton" aria-pressed="false" aria-label="Start or stop video">
+                    <!-- video icon -->
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17 10.5V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-3.5l4 4V6.5l-4 4z" fill="currentColor"/></svg>
+                    <span>Stop Video</span>
+                </button>
+
+                <button id="btn-share" class="controlButton" aria-pressed="false" aria-label="Share screen">
+                    <!-- share icon -->
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 16v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2v2H6v12h12v-2h2zM11 2h6v6h-2V5.414l-7.293 7.293-1.414-1.414L13.586 4H11V2z" fill="currentColor"/></svg>
+                    <span>Share Screen</span>
+                </button>
+            </div>
+        </section>
+
+        <aside class="mainRight" role="complementary" aria-label="Right sidebar">
+            <section id="chat-panel" class="panel chat drawer" aria-hidden="true">
+                <h2>Chat</h2>
+                <div id="messages" class="messages" role="log" aria-live="polite"></div>
+                <div class="chat-input">
+                    <label for="chat-message" class="visually-hidden">Message</label>
+                    <input id="chat-message" type="text" placeholder="Write a message..." aria-label="Chat message">
+                    <button id="chat-send" class="control">Send</button>
+                </div>
+            </section>
+
+            <section id="participants-panel" class="panel participants drawer" aria-hidden="true">
+                <h2>Participants</h2>
+                <ul id="participants-list" class="participants-list" role="list"></ul>
+            </section>
+        </aside>
+    </main>
+
+    <!-- Template for video tile -->
+    <template id="video-tile-template">
+        <div class="video-tile" role="listitem">
+            <div class="avatar" aria-hidden="true"></div>
+            <div class="tile-label"></div>
+        </div>
+    </template>
+
+    <!-- Mobile bottom bar -->
+    <div class="mobile-bar" role="toolbar" aria-label="Mobile meeting controls">
+        <button id="m-btn-mute" class="mobile-btn" aria-label="Mute"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3z" fill="currentColor"/></svg></button>
+        <button id="m-btn-video" class="mobile-btn" aria-label="Video"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 10.5V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-3.5l4 4V6.5l-4 4z" fill="currentColor"/></svg></button>
+        <button id="m-btn-chat" class="mobile-btn" aria-label="Chat"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 2H4a2 2 0 00-2 2v14l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2z" fill="currentColor"/></svg></button>
+        <button id="m-btn-participants" class="mobile-btn" aria-label="Participants"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM8 11c1.657 0 3-1.343 3-3S9.657 5 8 5 5 6.343 5 8s1.343 3 3 3z" fill="currentColor"/></svg></button>
+        <button id="m-btn-leave" class="mobile-btn leave" aria-label="Leave"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3h-8v2h8v14h-8v2h8a2 2 0 002-2V5a2 2 0 00-2-2z" fill="currentColor"/></svg></button>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -17,4 +102,5 @@
     </script>
     <script src="/script.js"></script>
 </body>
+</html>
 </html>

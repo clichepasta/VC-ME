@@ -23,9 +23,15 @@ app.get('/:room', (req, res) => {
 })
 
 io.on('connection', socket => {
-    socket.on('join-room',(roomId ) => {
-        socket.join(roomId);
-        socket.to(roomId).emit('user-connected'); // notify other users in the room
+    socket.on('join-room',(roomId, userId ) => {
+        socket.join(roomId, userId);
+        socket.to(roomId).emit('user-connected', userId); // notify other users in the room
+
+
+        socket.on('message', message => {
+            // broadcast message to everyone ELSE in the room (do not echo back to sender)
+            socket.to(roomId).emit('createMessage', message);
+        });
     })
 
 })
